@@ -1,0 +1,5 @@
+# Test/development dependencies (kept out of the runtime install). UNPINNED; use requirements-dev-lock.txt for the verified set.
+-r requirements.txt
+-r webapp/requirements.txt
+pytest
+pyflakes

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Trade Result{% endblock %}
+{% block content %}
+<h1>Trade Result &mdash; {{ ticker }}</h1>
+<p class="lede">Mode: <strong>{{ mode }}</strong></p>
+
+<div class="card">
+    {% if outcome.executed %}
+        <p><span class="badge-buy" style="padding:6px 12px; border-radius:4px;">EXECUTED</span></p>
+    {% else %}
+        <p><span class="badge-hold" style="padding:6px 12px; border-radius:4px;">NOT EXECUTED</span></p>
+    {% endif %}
+    <p>{{ outcome.reason }}</p>
+
+    {% if outcome.signal %}
+    <table>
+        <tr><th>Signal</th><td class="signal-{{ outcome.signal.action|lower }}">{{ outcome.signal.action }}</td></tr>
+        <tr><th>Predicted change</th><td>{{ "%+.2f"|format(outcome.signal.predicted_pct_change) }}%</td></tr>
+    </table>
+    {% endif %}
+    {% if outcome.quantity %}
+    <table>
+        <tr><th>Quantity</th><td>{{ outcome.quantity }}</td></tr>
+        <tr><th>Order value</th><td>{{ "%.2f"|format(outcome.order_value) }}</td></tr>
+    </table>
+    {% endif %}
+</div>
+
+<div class="actions-row">
+    <a href="{{ url_for('results') }}" class="btn btn-secondary">&larr; Back to results</a>
+    <a href="{{ url_for('index') }}" class="btn">New Prediction</a>
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<title>Quant Workstation</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='ws.css') }}">
+<script>
+(function(){
+  try {
+    var s = localStorage.getItem('ws.theme');
+    var t = s ? JSON.parse(s) : 'dark';
+    if (t === 'auto') {
+      t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch(e) {}
+})();
+</script>
+</head>
+<body>
+<a class="skip" href="#view">Skip to content</a>
+<div class="shell">
+  <aside class="rail">
+    <div class="brand">
+      <div class="brand-tag"><span class="term-tag">QUANT TERMINAL</span><span class="status-dot" title="Operational"></span></div>
+      <b>Quant Workstation</b>
+      <span>Institutional Research &amp; Paper Trading</span>
+    </div>
+    <nav aria-label="Sections">
+      <a href="#/overview"><span class="nav-ic">◈</span> Market Overview</a>
+      <a href="#/research"><span class="nav-ic">⌕</span> Instrument Research</a>
+      <div class="grp">QUANT MODELS</div>
+      <a href="#/forecast"><span class="nav-ic">⚡</span> Forecast Lab</a>
+      <a href="#/evaluation"><span class="nav-ic">☷</span> Model Evaluation</a>
+      <a href="#/backtest"><span class="nav-ic">⇄</span> Strategy Backtesting</a>
+      <a href="#/ai"><span class="nav-ic">✦</span> AI Research</a>
+      <div class="grp">EXECUTION &amp; RISK</div>
+      <a href="#/portfolio"><span class="nav-ic">⊞</span> Portfolio &amp; Paper</a>
+      <a href="#/risk"><span class="nav-ic">⚠</span> Risk &amp; Exposure</a>
+      <div class="grp">INFRASTRUCTURE</div>
+      <a href="#/health"><span class="nav-ic">♥</span> Data &amp; Model Health</a>
+      <a href="#/settings"><span class="nav-ic">⚙</span> Settings</a>
+    </nav>
+  </aside>
+  <div class="main-wrap">
+    <header class="top">
+      <form id="symform" role="search" aria-label="Select instrument">
+        <label for="sym" class="mu" style="align-self:center">Instrument</label>
+        <input class="inp" id="sym" name="symbol" placeholder="AAPL · NSE:RELIANCE · VOD.L" autocomplete="off" spellcheck="false" maxlength="24">
+        <button class="btn pri" type="submit">Load</button>
+      </form>
+      <div class="pills" id="top-pills" aria-label="Quick symbols">
+        <button type="button" class="pill" data-sym="AAPL">AAPL</button>
+        <button type="button" class="pill" data-sym="MSFT">MSFT</button>
+        <button type="button" class="pill" data-sym="NSE:TCS">NSE:TCS</button>
+        <button type="button" class="pill" data-sym="NVDA">NVDA</button>
+      </div>
+      <div class="quote" id="quote" aria-live="polite"></div>
+      <div class="top-right">
+        <div class="row" style="align-items:center">
+          <label for="refresh" class="mu">Auto-refresh</label>
+          <select class="sel sm" id="refresh"><option value="0">Off</option><option value="15">15 s</option><option value="30">30 s</option><option value="60">1 min</option><option value="300">5 min</option></select>
+          <button class="btn sm" id="refresh-now" type="button">Refresh quote</button>
+        </div>
+        <div class="row" style="align-items:center" role="group" aria-label="Theme preference">
+          <label for="theme-sel" class="mu">Theme</label>
+          <select class="sel sm" id="theme-sel" aria-label="Select theme"><option value="dark">Dark</option><option value="light">Light</option><option value="auto">Auto</option></select>
+        </div>
+      </div>
+      <div class="top-meta"><span id="prov" class="dim"></span><span id="age" class="dim"></span></div>
+    </header>
+    <main id="view" tabindex="-1"><noscript>This workstation needs JavaScript. The classic server-rendered form is still available below.</noscript></main>
+  </div>
+</div>
+{# Classic server-rendered flow (full report, exports, gated trade flow). Cloned into the Forecast Lab. #}
+<template id="classic-form">
+  <form method="post" action="{{ url_for('predict') }}" class="row" style="margin-top:8px">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="async" value="1">
+    <div class="fld"><label for="c-ticker">Ticker</label><input class="inp" id="c-ticker" name="ticker" value="{{ defaults.ticker if defaults is defined else '' }}" required></div>
+    <div class="fld"><label for="c-period">Period</label><select class="sel" id="c-period" name="period"><option>1y</option><option selected>2y</option><option>5y</option></select></div>
+    <div class="fld"><label for="c-epochs">Epochs</label><input class="inp" id="c-epochs" name="epochs" type="number" min="1" max="100" value="15" style="width:90px"></div>
+    <button class="btn" type="submit">Run Prediction (classic report)</button>
+  </form>
+</template>
+<noscript>
+  <form method="post" action="{{ url_for('predict') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label>Ticker <input name="ticker" required></label> <button type="submit">Run Prediction</button></form>
+</noscript>
+<script src="{{ url_for('static', filename='ws.js') }}"></script>
+</body>
+</html>

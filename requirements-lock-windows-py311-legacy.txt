@@ -1,0 +1,211 @@
+# requirements-lock.txt
+# ============================================================================
+# PINNED, TESTED dependency set for this project.
+#
+# These are the EXACT versions the full test suite was run against and
+# passed on -- not "latest", and not hand-picked. They come from a
+# `pip install -r requirements.txt` + `pip install -r webapp/requirements.txt`
+# + `pip install pytest` resolution, with only the packages actually
+# reachable from that dependency graph pinned here (see "EXCLUDED FROM THIS
+# FILE" at the bottom for what was left out, and why).
+#
+# TESTED ON
+#   Python   3.11.0
+#   Platform Windows, CPU only (tensorflow-cpu, no CUDA)
+#   Result   188 passed, 0 failed, 0 errors -- 206.80s
+#            (user-run and user-reported; not independently re-executed by
+#            an assistant in a network-isolated sandbox -- see README's
+#            "Tested versions" section)
+#
+# THIS IS A SINGLE-PLATFORM LOCK, NOT A UNIVERSAL ONE.
+#   Only Windows + Python 3.11.0 has actually been verified against these
+#   exact pins. TensorFlow (and, transitively, several of its own
+#   dependencies) ships different wheels per OS/architecture, so this exact
+#   file is not guaranteed to resolve -- let alone behave identically -- on
+#   Linux, macOS, or a different Python minor version. Two markers below
+#   (colorama, tzdata) are Windows-conditional and will simply be skipped by
+#   pip on other platforms, but that alone does not make the rest of the
+#   file cross-platform. If you need a verified lock for another OS, the
+#   honest path is to `pip install -r requirements.txt` there, run the full
+#   suite, and freeze *that* result as its own lock file -- not to assume
+#   this one carries over.
+#
+# HOW TO USE (Windows, matching the tested environment)
+#   py -3.11 -m venv .venv
+#   .venv\Scripts\activate
+#   pip install -r requirements-lock.txt
+#
+# HOW TO USE (other platforms -- unpinned, not reproducibility-verified)
+#   python3 -m venv .venv
+#   . .venv/bin/activate
+#   pip install -r requirements.txt
+#   pip install -r webapp/requirements.txt
+#
+# requirements.txt REMAINS the default install path and is deliberately
+# unpinned -- TensorFlow wheels in particular vary a lot across platforms and
+# architectures, so hard pins can make a plain `pip install -r
+# requirements.txt` fail on machines these exact builds were never published
+# for. Use this lock file when you need reproducibility on Windows/3.11
+# specifically (CI matched to that environment, or reproducing the 188/0/0
+# result above); use requirements.txt when you just want it to install.
+#
+# NOT A SECURITY GUARANTEE: pinning freezes behavior, including any
+# vulnerability present in a pinned version. Re-resolve and re-run the test
+# suite periodically rather than treating this file as permanent.
+# ============================================================================
+
+# --- Direct dependencies (requirements.txt) ---
+numpy==2.4.6
+pandas==3.0.5
+scikit-learn==1.9.1
+tensorflow_cpu==2.21.0
+yfinance==1.7.0
+matplotlib==3.11.1
+anthropic==1.6.0
+openai==3.14.1
+requests==2.34.2
+python-dotenv==1.2.3
+
+# --- Direct dependencies (webapp/requirements.txt) ---
+Flask==3.1.3
+reportlab==5.0.1
+
+# --- Test runner (not needed to run the app itself) ---
+pytest==9.1.1
+iniconfig==2.3.0
+pluggy==1.6.0
+
+# --- Transitive: scikit-learn ---
+scipy==1.17.1
+joblib==1.6.0
+threadpoolctl==3.7.0
+
+# --- Transitive: tensorflow-cpu / keras ---
+keras==3.15.1
+h5py==3.14.0
+protobuf==7.36.1
+absl-py==2.5.0
+astunparse==1.6.3
+flatbuffers==25.12.19
+gast==0.7.0
+google-pasta==0.2.0
+libclang==18.1.1
+ml_dtypes==0.6.0
+namex==0.1.0
+opt_einsum==3.4.0
+optree==0.20.0
+termcolor==3.3.0
+wrapt==2.4.1
+typing_extensions==4.16.0
+packaging==26.3
+# grpcio: two separate claims here, kept distinct.
+# OBSERVED (freeze evidence): grpcio==1.84.0 is an actual line in the
+# pip freeze from the verified Windows/3.11.0 environment -- it was really
+# installed there.
+# INFERENCE (not independently verified): it's placed in this
+# tensorflow-cpu/keras block because grpcio has long been a *direct*
+# dependency of the tensorflow/tensorflow-cpu package itself (its
+# distributed-runtime worker coordination, not only pulled in via
+# tensorboard) across TensorFlow versions this has actually been checked
+# against. tensorflow_cpu==2.21.0 is newer than any release that specific
+# fact has been directly confirmed for, and this sandbox has no network
+# access to query that package's metadata live, so the dependency-graph
+# attribution is a well-founded inference, not a confirmed
+# `pip show tensorflow-cpu` result. Run `pip show tensorflow-cpu` yourself
+# for a hard confirmation of *why* it's there.
+grpcio==1.84.0
+# keras 3's console/progress-bar rendering pulls in rich, which pulls in
+# markdown-it-py + Pygments, which pulls in mdurl.
+rich==15.0.0
+markdown-it-py==4.2.0
+Pygments==2.21.0
+mdurl==0.1.2
+
+# --- Transitive: yfinance ---
+multitasking==0.0.13
+peewee==4.5.1
+websockets==17.1
+beautifulsoup4==4.15.0
+soupsieve==2.9.2
+lxml==6.1.3
+curl_cffi==0.16.3
+cffi==2.1.1
+pycparser==3.0
+
+# --- Transitive: pandas ---
+python-dateutil==2.9.0.post0
+pytz==2026.3.post1
+six==1.17.0
+tzdata==2026.4; sys_platform == "win32"
+
+# --- Transitive: matplotlib ---
+contourpy==1.3.3
+cycler==0.12.1
+fonttools==4.64.0
+kiwisolver==1.5.1
+pyparsing==3.3.2
+pillow==12.3.0
+
+# --- Transitive: Flask ---
+Werkzeug==3.1.8
+Jinja2==3.1.3
+MarkupSafe==3.0.3
+itsdangerous==2.2.0
+click==8.5.0
+blinker==1.9.0
+colorama==0.4.6; sys_platform == "win32"
+
+# --- Transitive: anthropic / openai clients (httpx-based) ---
+httpx==0.28.1
+httpcore==1.0.9
+h11==0.16.0
+anyio==4.14.2
+sniffio==1.3.1
+pydantic==2.13.5
+pydantic_core==2.46.5
+annotated-types==0.8.0
+typing-inspection==0.4.4
+jiter==0.17.0
+
+# --- Transitive: requests ---
+certifi==2026.7.22
+urllib3==2.8.0
+charset-normalizer==3.5.1
+idna==3.19
+
+# ============================================================================
+# EXCLUDED FROM THIS FILE
+#
+# The environment this freeze came from was not an isolated venv containing
+# only this project's dependencies -- it also had packages from unrelated
+# work installed. `pip freeze` reports everything installed regardless of
+# why it's there, so the following were deliberately NOT pinned because
+# nothing in requirements.txt, webapp/requirements.txt, or pytest actually
+# depends on them:
+#
+#   torch, torchvision           -- this project uses tensorflow-cpu, not
+#                                    torch; nothing here imports it
+#   fastapi, starlette, uvicorn,
+#   watchfiles, python-multipart,
+#   annotated-doc, docstring_parser -- FastAPI/ASGI stack; this app is Flask
+#   truststore, narwhals, tifffile  -- no dependency chain to any package
+#                                       pinned above
+#   sympy, networkx, mpmath,
+#   filelock, fsspec, cloudpickle   -- torch's own dependency tree
+#   PyYAML                          -- not confirmed as required by the
+#                                       pinned keras/tensorflow-cpu versions;
+#                                       left out rather than guessed at
+#
+# (grpcio is NOT excluded -- see the comment above its pin, in the
+# tensorflow-cpu/keras block: it's included as a well-founded inference from
+# TensorFlow's known dependency shape, not a live-verified fact for this
+# exact pinned version.)
+#
+# Also excluded, and worth being direct about: the source list this file
+# was reconciled from also contained "httpx2==2.13.0" and
+# "httpcore2==2.13.0". Those are not real PyPI packages -- there is no
+# "httpx2" or "httpcore2" -- so they cannot be genuine output of a real
+# `pip freeze`. The real, existing packages `httpx` and `httpcore` (pinned
+# above at 0.28.1 / 1.0.9) are what anthropic/openai's HTTP layer actually
+# uses. Do not add "httpx2"/"httpcore2" back into this file.
+# ============================================================================

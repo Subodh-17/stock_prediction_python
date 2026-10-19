@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Running prediction{% endblock %}
+{% block content %}
+<h1>Running prediction for {{ ticker }}</h1>
+<div id="job" data-job-id="{{ job_id }}" data-timeout="{{ timeout }}" aria-live="polite">
+  <p id="job-status">Model training runs in the background. This page checks its real status; it does not guess.</p>
+  <p><a class="btn" id="job-cancel" href="#" role="button">Cancel</a></p>
+</div>
+<noscript><p>This page needs JavaScript to check progress. Open <code>/predict/claim/{{ job_id }}</code> when the job has finished.</p></noscript>
+<script src="{{ url_for('static', filename='job_poll.js') }}"></script>
+{% endblock %}

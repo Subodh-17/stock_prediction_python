@@ -1,0 +1,117 @@
+{
+ "timestamp": "2026-10-19T14:41:56Z",
+ "server": "http://127.0.0.1:5000",
+ "data_source": "Yahoo Finance (real live delayed quotes & 1y daily bars)",
+ "viewports": {
+  "desktop": [
+   1440,
+   900
+  ],
+  "mobile": [
+   390,
+   844
+  ]
+ },
+ "captures": {
+  "desktop_overview": {
+   "path": "E:\\Projects\\stock_prediction_python\\docs\\screenshots\\v23_1\\desktop_overview.png",
+   "bytes": 172081,
+   "status": "PASS"
+  },
+  "desktop_research": {
+   "path": "E:\\Projects\\stock_prediction_python\\docs\\screenshots\\v23_1\\desktop_research.png",
+   "bytes": 149961,
+   "status": "PASS"
+  },
+  "desktop_forecast": {
+   "path": "E:\\Projects\\stock_prediction_python\\docs\\screenshots\\v23_1\\desktop_forecast.png",
+   "bytes": 240900,
+   "status": "PASS"
+  },
+  "desktop_evaluation": {
+   "path": "E:\\Projects\\stock_prediction_python\\docs\\screenshots\\v23_1\\desktop_evaluation.png",
+   "bytes": 296702,
+   "status": "PASS"
+  },
+  "desktop_backtest": {
+   "path": "E:\\Projects\\stock_prediction_python\\docs\\screenshots\\v23_1\\desktop_backtest.png",
+   "bytes": 59621,
+   "status": "PASS"
+  },
+  "desktop_ai": {
+   "path": "E:\\Projects\\stock_prediction_python\\docs\\screenshots\\v23_1\\desktop_ai.png",
+   "bytes": 101428,
+   "status": "PASS"
+  },
+  "desktop_portfolio": {
+   "path": "E:\\Projects\\stock_prediction_python\\docs\\screenshots\\v23_1\\desktop_portfolio.png",
+   "bytes": 111100,
+   "status": "PASS"
+  },
+  "desktop_risk": {
+   "path": "E:\\Projects\\stock_prediction_python\\docs\\screenshots\\v23_1\\desktop_risk.png",
+   "bytes": 104668,
+   "status": "PASS"
+  },
+  "desktop_health": {
+   "path": "E:\\Projects\\stock_prediction_python\\docs\\screenshots\\v23_1\\desktop_health.png",
+   "bytes": 179947,
+   "status": "PASS"
+  },
+  "desktop_settings": {
+   "path": "E:\\Projects\\stock_prediction_python\\docs\\screenshots\\v23_1\\desktop_settings.png",
+   "bytes": 143678,
+   "status": "PASS"
+  },
+  "mobile_overview": {
+   "path": "E:\\Projects\\stock_prediction_python\\docs\\screenshots\\v23_1\\mobile_overview.png",
+   "bytes": 146891,
+   "status": "PASS"
+  },
+  "mobile_research": {
+   "path": "E:\\Projects\\stock_prediction_python\\docs\\screenshots\\v23_1\\mobile_research.png",
+   "bytes": 114662,
+   "status": "PASS"
+  },
+  "mobile_forecast": {
+   "path": "E:\\Projects\\stock_prediction_python\\docs\\screenshots\\v23_1\\mobile_forecast.png",
+   "bytes": 161142,
+   "status": "PASS"
+  },
+  "mobile_evaluation": {
+   "path": "E:\\Projects\\stock_prediction_python\\docs\\screenshots\\v23_1\\mobile_evaluation.png",
+   "bytes": 240304,
+   "status": "PASS"
+  },
+  "mobile_backtest": {
+   "path": "E:\\Projects\\stock_prediction_python\\docs\\screenshots\\v23_1\\mobile_backtest.png",
+   "bytes": 37577,
+   "status": "PASS"
+  },
+  "mobile_ai": {
+   "path": "E:\\Projects\\stock_prediction_python\\docs\\screenshots\\v23_1\\mobile_ai.png",
+   "bytes": 76275,
+   "status": "PASS"
+  },
+  "mobile_portfolio": {
+   "path": "E:\\Projects\\stock_prediction_python\\docs\\screenshots\\v23_1\\mobile_portfolio.png",
+   "bytes": 73855,
+   "status": "PASS"
+  },
+  "mobile_risk": {
+   "path": "E:\\Projects\\stock_prediction_python\\docs\\screenshots\\v23_1\\mobile_risk.png",
+   "bytes": 68503,
+   "status": "PASS"
+  },
+  "mobile_health": {
+   "path": "E:\\Projects\\stock_prediction_python\\docs\\screenshots\\v23_1\\mobile_health.png",
+   "bytes": 172698,
+   "status": "PASS"
+  },
+  "mobile_settings": {
+   "path": "E:\\Projects\\stock_prediction_python\\docs\\screenshots\\v23_1\\mobile_settings.png",
+   "bytes": 111010,
+   "status": "PASS"
+  }
+ }
+}

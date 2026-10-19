@@ -1,0 +1,3 @@
+# Intentionally unpinned -- see README.md's "Tested versions" section.
+flask
+reportlab

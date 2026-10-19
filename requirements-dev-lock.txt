@@ -1,0 +1,9 @@
+# requirements-dev-lock.txt -- TEST-ONLY pins (V18), layered on the runtime lock.
+# Install:  pip install -r requirements-dev-lock.txt        (pulls requirements-lock.txt first)
+# Verified on CPython 3.12 / Linux x86_64 in a clean venv created from requirements-lock.txt, 2026-10-11.
+# Browser tests (Playwright/axe-core) are NOT in this file: they are optional tooling, run by hand (see docs/V18_CHANGES.md).
+-r requirements-lock.txt
+iniconfig==2.3.1
+pluggy==1.6.0
+pytest==9.1.1
+pyflakes==4.0.3

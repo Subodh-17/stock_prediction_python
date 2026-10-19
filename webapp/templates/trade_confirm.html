@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Confirm Live Trade{% endblock %}
+{% block content %}
+<h1>Confirm Live Trade</h1>
+
+<div class="callout warn">
+    <strong>This will place a REAL order</strong> for <strong>{{ r.ticker }}</strong>
+    through your {{ broker|capitalize }} account. This is not a drill and not
+    reversible by refreshing the page. You are solely responsible for any
+    trade executed from here.
+</div>
+
+<div class="card">
+    <table>
+        <tr><th>Ticker</th><td>{{ r.ticker }}</td></tr>
+        <tr><th>Signal</th><td class="signal-{{ r.final_signal.action|lower }}">{{ r.final_signal.action }}</td></tr>
+        <tr><th>Current price</th><td>{{ "%.2f"|format(r.final_ensemble.current_price) }}</td></tr>
+        <tr><th>Predicted price</th><td>{{ "%.2f"|format(r.final_ensemble.final_predicted_price) }}</td></tr>
+        <tr><th>Broker</th><td>{{ broker|capitalize }}</td></tr>
+    </table>
+
+    <form action="{{ url_for('trade_execute') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="token" value="{{ token }}">
+        <div class="field" style="margin-top:20px;">
+            <label for="confirmation_phrase">
+                Type <code>{{ confirmation_phrase }}</code> exactly to submit this order
+            </label>
+            <input type="text" id="confirmation_phrase" name="confirmation_phrase"
+                   placeholder="{{ confirmation_phrase }}" autocomplete="off" required>
+        </div>
+        <div class="actions-row">
+            <button type="submit" class="btn-danger">Submit Real Order</button>
+            <a href="{{ url_for('results') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+# --- Secrets -- NEVER commit these ---
+.env
+.env.local
+*.env
+*.pem
+*.key
+credentials.json
+secrets.json
+*.secret
+.credentials/
+
+# --- Local trading/broker state (instance-specific, not shared config) ---
+.paper_portfolio.json
+.upstox_token_cache.json
+.upstox_instruments_cache_*.json
+.groww_token_cache.json
+outputs/trade_log.csv
+
+# --- Generated output (reports, charts) -- regenerate, don't version ---
+outputs/
+*.zip
+*.zip.manifest.json
+*.manifest.json
+*.sha256
+*.png
+!webapp/static/**/*.png
+!docs/screenshots/**/*.png
+
+# --- Model checkpoints (can be large binary files) ---
+checkpoints/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+venv/
+.venv/
+env/
+
+# --- Editors / OS ---
+.DS_Store
+.vscode/
+.idea/
+
+# generated caches
+.upstox_instruments_cache_*.json
+.paper_portfolio.json
+
+# Additional local secrets and generated files
+.env
+.env.*
+!.env.example
+checkpoints/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+outputs/
+*.zip
+*.sha256
+*.manifest.json
+.paper_portfolio.json

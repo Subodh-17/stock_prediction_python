@@ -1,0 +1,16 @@
+# Intentionally unpinned -- see README.md's "Tested versions" section for
+# the exact versions this project was developed and verified against.
+# Pinning exact versions here risks breaking installs on platforms/
+# architectures those exact pins weren't built for (tensorflow-cpu wheels
+# in particular vary a lot by platform); documenting known-good versions
+# separately is the safer tradeoff recommended for this kind of project.
+numpy
+pandas
+scikit-learn
+tensorflow-cpu
+yfinance
+matplotlib
+anthropic
+openai
+requests
+python-dotenv

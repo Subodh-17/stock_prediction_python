@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Multi-AI Stock Prediction Ensemble{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="topbar">
+    <a href="{{ url_for('index') }}" class="brand">
+        <span class="brand-mark">&#9642;</span> ENSEMBLE<span class="brand-dim">/terminal</span>
+    </a>
+    <span class="topbar-note">LR + LSTM + 5-model LLM panel &mdash; paper trading by default</span>
+</header>
+<main class="page">
+{% block content %}{% endblock %}
+</main>
+<footer class="footer">
+    Educational tool, not investment advice. Predictions come from statistical models
+    and LLM opinions &mdash; none of them can reliably predict markets.
+</footer>
+</body>
+</html>

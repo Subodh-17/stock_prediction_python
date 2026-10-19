@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+{% block title %}{{ r.ticker }} &mdash; Results{% endblock %}
+{% block content %}
+<h1>{{ r.ticker }}</h1>
+
+{% if r.resolved_ticker and r.resolved_ticker != r.ticker %}
+<div class="callout warn">
+    <strong>Symbol was resolved automatically:</strong> you entered <code>{{ r.ticker }}</code>, but the data and
+    predictions below are for <code>{{ r.resolved_ticker }}</code> (a different listing may share a similar ticker).
+    Enter the full symbol, e.g. <code>NSE:{{ r.ticker }}</code> in the workstation, if this is not the instrument you meant.
+</div>
+{% endif %}
+
+{% if r.dropped_open_session_bar %}
+<div class="callout warn">
+    <strong>Unfinished session excluded:</strong> the newest bar ({{ r.dropped_open_session_bar }}) belonged to a trading session
+    that had not ended, so it was removed rather than treated as a settled close. All results use completed sessions only.
+</div>
+{% endif %}
+
+{% if r.data_quality and not r.data_quality.is_valid %}
+<div class="callout warn">
+    <strong>Data quality notice:</strong> {{ r.data_quality.issues|join('; ') }}
+    &mdash; treat the predictions below with extra caution.
+</div>
+{% endif %}
+
+<p class="lede">
+    Current price: <strong>{{ "%.2f"|format(r.final_ensemble.current_price) }}</strong>
+    &nbsp;&middot;&nbsp; Predicted next: <strong>{{ "%.2f"|format(r.final_ensemble.final_predicted_price) }}</strong>
+    ({{ "%+.2f"|format(r.final_ensemble.predicted_pct_change) }}%)
+</p>
+
+<h2>Ensemble Vote</h2>
+<div class="vote-strip">
+    {% for v in r.votes %}
+    <div class="vote-chip">
+        <span class="vote-name">{{ v.name }}</span>
+        <span class="vote-dir signal-{{ v.direction|lower }}">
+            {%- if v.direction == "BUY" %}&#9650; BUY
+            {%- elif v.direction == "SELL" %}&#9660; SELL
+            {%- elif v.direction == "HOLD" %}&#9679; HOLD
+            {%- else %}&mdash;{% endif -%}
+        </span>
+    </div>
+    <span class="vote-arrow">&rarr;</span>
+    {% endfor %}
+    <div class="vote-final badge-{{ r.final_signal.action|lower }}">
+        FINAL: {{ r.final_signal.action }}
+    </div>
+</div>
+<p class="hint" style="margin-top:10px;">{{ r.final_signal.reasoning }}</p>
+
+{% if r.final_ensemble.weights_used %}
+<h2>Ensemble Weights</h2>
+<div class="metrics-grid">
+    <div class="metric"><div class="metric-label">Weighting Mode</div><div class="metric-value">{{ r.final_ensemble.weights_used.mode or "fixed" }}</div></div>
+    <div class="metric"><div class="metric-label">Linear Regression</div><div class="metric-value">{{ "%.0f"|format(r.final_ensemble.weights_used.linear_regression * 100) }}%</div></div>
+    <div class="metric"><div class="metric-label">LSTM</div><div class="metric-value">{{ "%.0f"|format(r.final_ensemble.weights_used.lstm * 100) }}%</div></div>
+    <div class="metric"><div class="metric-label">LLM Panel</div><div class="metric-value">{{ "%.0f"|format(r.final_ensemble.weights_used.llm_panel * 100) }}%</div></div>
+</div>
+{% if r.final_ensemble.weights_used.mode == "fixed_fallback" %}
+<p class="hint">Dynamic weighting was requested but fell back to fixed weights: {{ r.final_ensemble.weights_used.basis.reason }}</p>
+{% endif %}
+{% endif %}
+
+{% if r.confidence %}
+<h2>Confidence &amp; Uncertainty <span class="hint">(approximate, not a statistical guarantee)</span></h2>
+<div class="metrics-grid">
+    <div class="metric"><div class="metric-label">Confidence</div><div class="metric-value">{{ r.confidence.confidence_label }}</div></div>
+    <div class="metric"><div class="metric-label">Model Agreement</div><div class="metric-value">{{ r.confidence.model_agreement.agreement_label }}</div></div>
+    {% if r.confidence.approximate_price_range %}
+    <div class="metric"><div class="metric-label">Approx. Price Range</div><div class="metric-value">{{ "%.2f"|format(r.confidence.approximate_price_range.low) }} &ndash; {{ "%.2f"|format(r.confidence.approximate_price_range.high) }}</div></div>
+    {% endif %}
+</div>
+<p class="hint">{{ r.confidence.methodology_note }}</p>
+{% endif %}
+
+<h2>Price Error &amp; Directional Accuracy</h2>
+<div class="metrics-grid">
+    <div class="metric"><div class="metric-label">LR &middot; RMSE</div><div class="metric-value">{{ "%.3f"|format(r.lr_eval.rmse) }}</div></div>
+    <div class="metric"><div class="metric-label">LR &middot; MAE</div><div class="metric-value">{{ "%.3f"|format(r.lr_eval.mae) }}</div></div>
+    <div class="metric"><div class="metric-label">LR &middot; R&sup2;</div><div class="metric-value">{{ "%.3f"|format(r.lr_eval.r2) }}</div></div>
+    <div class="metric"><div class="metric-label">LR &middot; Directional Accuracy</div><div class="metric-value">{{ "%.1f"|format(r.lr_eval.accuracy_pct) }}%</div></div>
+    <div class="metric"><div class="metric-label">LSTM &middot; RMSE</div><div class="metric-value">{{ "%.3f"|format(r.lstm_eval.rmse) }}</div></div>
+    <div class="metric"><div class="metric-label">LSTM &middot; MAE</div><div class="metric-value">{{ "%.3f"|format(r.lstm_eval.mae) }}</div></div>
+    <div class="metric"><div class="metric-label">LSTM &middot; R&sup2;</div><div class="metric-value">{{ "%.3f"|format(r.lstm_eval.r2) }}</div></div>
+    <div class="metric"><div class="metric-label">LSTM &middot; Directional Accuracy</div><div class="metric-value">{{ "%.1f"|format(r.lstm_eval.accuracy_pct) }}%</div></div>
+</div>
+<p class="hint">
+    RMSE / MAE / R&sup2; are PRICE ERROR metrics (how close the predicted dollar
+    price was). "Directional Accuracy" is a separate, unrelated metric -- the %
+    of test-set days the model correctly called whether price would go up or
+    down. A model can have good directional accuracy with mediocre price error,
+    or vice versa; neither number is "the" accuracy of the model on its own,
+    and this is a backward-looking, held-out-test-set measurement, not a
+    guarantee about future predictions.
+</p>
+
+{% if r.walk_forward_lr or r.walk_forward_lstm %}
+<h2>Walk-Forward Validation</h2>
+<p class="hint">
+    Expanding-window validation across several chronological folds (never
+    shuffled), in addition to the single train/test split above -- a more
+    robust picture of how each model performs across different time periods.
+</p>
+<div class="metrics-grid">
+    {% if r.walk_forward_lr %}
+    <div class="metric"><div class="metric-label">LR &middot; Folds (successful/requested)</div><div class="metric-value">{{ r.walk_forward_lr.n_folds }}/{{ r.walk_forward_lr.n_folds_requested }}</div></div>
+    <div class="metric"><div class="metric-label">LR &middot; Mean RMSE</div><div class="metric-value">{{ "%.3f"|format(r.walk_forward_lr.mean_rmse) }}</div></div>
+    <div class="metric"><div class="metric-label">LR &middot; Mean Dir. Accuracy</div><div class="metric-value">{{ "%.1f"|format(r.walk_forward_lr.mean_directional_accuracy_pct) }}%</div></div>
+    {% endif %}
+    {% if r.walk_forward_lstm %}
+    <div class="metric"><div class="metric-label">LSTM &middot; Folds (successful/requested)</div><div class="metric-value">{{ r.walk_forward_lstm.n_folds }}/{{ r.walk_forward_lstm.n_folds_requested }}</div></div>
+    <div class="metric"><div class="metric-label">LSTM &middot; Mean RMSE</div><div class="metric-value">{{ "%.3f"|format(r.walk_forward_lstm.mean_rmse) }}</div></div>
+    <div class="metric"><div class="metric-label">LSTM &middot; Mean Dir. Accuracy</div><div class="metric-value">{{ "%.1f"|format(r.walk_forward_lstm.mean_directional_accuracy_pct) }}%</div></div>
+    {% endif %}
+</div>
+{% endif %}
+
+{% if r.backtest %}
+<h2>Backtest &mdash; Trading Strategy Performance <span class="hint">(simulated, vs. Buy &amp; Hold)</span></h2>
+<p class="hint">
+    SIMULATED historical performance only -- not a guarantee of future
+    results, and a DIFFERENT thing from the model prediction accuracy
+    metrics above (those measure price-forecast error; this measures what a
+    simple threshold trading rule following that forecast would have made,
+    including transaction costs). Uses each model's held-out test-period
+    predictions; see the assumptions note in each row.
+</p>
+<table>
+    <tr><th>Strategy</th><th>Weighting</th><th>Total Return</th><th>Buy &amp; Hold</th><th>Max Drawdown</th><th>Sharpe</th><th>Sortino</th><th>Calmar</th><th>Trades</th><th>Win Rate</th><th>Profit Factor</th><th>Avg Trade</th></tr>
+    {% for key, bt in r.backtest.items() %}
+    <tr>
+        <td>{{ bt.strategy_name }}</td>
+        <td>
+            {%- if key != "ensemble" -%}
+                N/A
+            {%- elif bt.weighting_mode == "dynamic" -%}
+                Dynamic ({{ bt.weighting_detail.n_days_dynamic }}/{{ bt.weighting_detail.n_days_dynamic + bt.weighting_detail.n_days_fixed_fallback }} days)
+            {%- else -%}
+                Fixed
+            {%- endif -%}
+        </td>
+        <td>{{ "%+.2f"|format(bt.total_return_pct) }}%</td>
+        <td>{{ "%+.2f"|format(bt.buy_hold_return_pct) }}%</td>
+        <td>{{ "%.2f"|format(bt.max_drawdown_pct) }}%</td>
+        <td>{{ "%.2f"|format(bt.sharpe_ratio) if bt.sharpe_ratio is not none else "n/a" }}</td>
+        <td>{{ "%.2f"|format(bt.sortino_ratio) if bt.sortino_ratio is not none else "n/a" }}</td>
+        <td>{{ "%.2f"|format(bt.calmar_ratio) if bt.calmar_ratio is not none else "n/a" }}</td>
+        <td>{{ bt.num_trades }}</td>
+        <td>{{ "%.1f"|format(bt.win_rate_pct) + "%" if bt.win_rate_pct is not none else "n/a" }}</td>
+        <td>{{ "%.2f"|format(bt.profit_factor) if bt.profit_factor is not none else "n/a" }}</td>
+        <td>{{ "%+.2f"|format(bt.avg_trade_return_pct) + "%" if bt.avg_trade_return_pct is not none else "n/a" }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<p class="hint">
+    "Weighting" is how the LR/LSTM/LLM split was determined for the ensemble
+    row above. <strong>Fixed</strong> applies the configured static split
+    (see "Ensemble Weights" above) uniformly across the whole backtest
+    period -- valid either way, since a fixed constant isn't derived from
+    any data. <strong>Dynamic</strong> recomputes the split for each
+    backtest day using only walk-forward validation folds that concluded
+    strictly before that day (never today's final weights applied across
+    history); days without enough prior fold history yet fall back to the
+    fixed split, shown as the day count above.
+</p>
+{% endif %}
+
+<div class="actions-row">
+    <a href="{{ url_for('export_csv') }}" class="btn btn-secondary">&#128193; Export CSV</a>
+    <a href="{{ url_for('export_pdf') }}" class="btn btn-secondary">&#128193; Export PDF</a>
+</div>
+
+<h2>Charts</h2>
+<div class="chart-block">
+    <img src="data:image/png;base64,{{ r.charts.comparison }}" alt="Actual vs predicted price chart">
+</div>
+{% if r.charts.panel %}
+<div class="chart-block">
+    <img src="data:image/png;base64,{{ r.charts.panel }}" alt="LLM panel votes chart">
+</div>
+{% endif %}
+<div class="chart-block">
+    <img src="data:image/png;base64,{{ r.charts.ensemble }}" alt="Final ensemble comparison chart">
+</div>
+
+{% if r.llm_results %}
+<h2>LLM Panel Detail <span class="hint">(language-model opinion, not market fact)</span></h2>
+<p class="hint">
+    Everything in this table was generated by a language model reasoning over
+    the short trend summary it was sent -- it is qualitative opinion, not a
+    quantitative model output and not verified market data. The two numerical
+    models (Linear Regression, LSTM) are the only components fitted to actual
+    price history; the panel's combined influence on the final prediction is
+    capped at its configured weight shown under "Ensemble Weights" above.
+    Treat the "Confidence" column as each model's self-report, which is not
+    calibrated against anything.
+</p>
+<table>
+    <tr><th>Provider</th><th>Direction</th><th>Confidence</th><th>Est. % change</th><th>Reasoning</th></tr>
+    {% for res in r.llm_results %}
+    <tr>
+        <td>{{ res.provider }}</td>
+        {% if res.error %}
+        <td colspan="4" style="color:var(--text-muted);">Skipped/error: {{ res.error }}</td>
+        {% else %}
+        <td class="signal-{{ 'buy' if res.direction=='up' else ('sell' if res.direction=='down' else 'hold') }}">{{ res.direction }}</td>
+        <td>{{ "%.0f"|format(res.confidence * 100) }}%</td>
+        <td>{{ "%+.2f"|format(res.estimated_pct_change) }}%</td>
+        <td>{{ res.reasoning }}</td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+<h2>Act On This</h2>
+<div class="card">
+    <p class="lede">
+        Simulated (paper) trading by default. No real money moves unless you
+        explicitly switch to live mode below, which requires
+        <code>ENABLE_LIVE_TRADING=true</code> to already be set in <code>.env</code>
+        on the server, plus a typed confirmation on the next page.
+    </p>
+    <form action="{{ url_for('trade') }}" method="post" class="actions-row">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="mode" value="paper">
+        <button type="submit">Paper Trade &rarr;</button>
+    </form>
+
+    {% if enable_live_trading %}
+    <form action="{{ url_for('trade') }}" method="post" class="actions-row">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="mode" value="live">
+        <select name="broker" class="field" style="width:auto; background:var(--bg); color:var(--text); border:1px solid var(--border); border-radius:var(--radius); padding:10px;">
+            <option value="upstox">Upstox</option>
+            <option value="groww">Groww</option>
+        </select>
+        <input type="password" name="operator_secret" class="field" style="width:auto;"
+               autocomplete="off" placeholder="Operator secret">
+        <button type="submit" class="btn-danger">Live Trade &rarr;</button>
+    </form>
+    <p class="hint">
+        The operator secret is <code>WEBAPP_LIVE_TRADING_TOKEN</code> from the
+        server's <code>.env</code>. It is required in addition to
+        <code>ENABLE_LIVE_TRADING=true</code> and the typed confirmation on the
+        next page, so that simply being able to reach this page is never enough
+        to place a real order.
+    </p>
+    {% else %}
+    <div class="callout warn" style="margin-top:16px;">
+        Live trading is currently unavailable on this server.
+        {% if live_trading_blocked_reason %}<br>{{ live_trading_blocked_reason }}{% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<div class="actions-row">
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">&larr; New Prediction</a>
+</div>
+{% endblock %}

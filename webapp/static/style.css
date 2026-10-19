@@ -1,0 +1,266 @@
+/* ============================================================================
+   Design system: "terminal meets ledger" -- deep ink-navy, warm amber accent
+   (evoking ticker-tape/phosphor displays), IBM Plex Mono for all data/numbers
+   (financial dashboards need tabular figure alignment), IBM Plex Sans for
+   body copy. Signal colors (buy/sell/hold) are muted, not neon -- they're
+   functional, not decorative.
+   ============================================================================ */
+
+:root {
+    --bg: #10141F;
+    --surface: #1A2133;
+    --surface-alt: #212B42;
+    --border: #2A3348;
+    --text: #EDEAE2;
+    --text-muted: #8B93A7;
+    --accent: #E8A33D;
+    --accent-dim: #B8822E;
+    --buy: #3FAE72;
+    --buy-bg: rgba(63, 174, 114, 0.12);
+    --sell: #D9704F;
+    --sell-bg: rgba(217, 112, 79, 0.12);
+    --hold: #8B93A7;
+    --hold-bg: rgba(139, 147, 167, 0.12);
+    --radius: 6px;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --sans: "IBM Plex Sans", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.55;
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 32px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.brand {
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--text);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+}
+.brand-mark { color: var(--accent); }
+.brand-dim { color: var(--text-muted); font-weight: 400; }
+
+.topbar-note {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+}
+
+.footer {
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    padding: 24px;
+    border-top: 1px solid var(--border);
+}
+
+h1 {
+    font-family: var(--mono);
+    font-size: 1.7rem;
+    font-weight: 600;
+    margin: 0 0 8px;
+}
+h2 {
+    font-family: var(--mono);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 32px 0 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+p.lede { color: var(--text-muted); margin-top: 0; }
+
+/* --- form / "order ticket" card --- */
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+}
+
+.field { margin-bottom: 20px; }
+.field label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+}
+.field input[type=text], .field input[type=number], .field select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 0.95rem;
+}
+.field input:focus, .field select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+.field-row { display: flex; gap: 16px; }
+.field-row .field { flex: 1; }
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+.hint { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
+
+button, .btn {
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 12px 22px;
+    border-radius: var(--radius);
+    border: none;
+    cursor: pointer;
+    background: var(--accent);
+    color: #1A1305;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.15s ease;
+}
+button:hover, .btn:hover { background: var(--accent-dim); }
+.btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+.btn-secondary:hover { border-color: var(--accent); background: var(--surface-alt); }
+.btn-danger { background: var(--sell); color: #2A0E05; }
+.btn-danger:hover { background: #c05f42; }
+
+/* --- vote strip (signature element): each model's individual signal
+   converging toward one final badge --- */
+.vote-strip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+.vote-chip {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--bg);
+    min-width: 90px;
+    text-align: center;
+}
+.vote-chip .vote-name { display: block; color: var(--text-muted); font-size: 0.72rem; margin-bottom: 3px; }
+.vote-chip .vote-dir { font-weight: 600; font-size: 1rem; }
+.vote-arrow { color: var(--text-muted); font-size: 1.2rem; }
+.vote-final {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 1.15rem;
+    padding: 12px 22px;
+    border-radius: var(--radius);
+    margin-left: auto;
+}
+
+.signal-buy { color: var(--buy); }
+.signal-sell { color: var(--sell); }
+.signal-hold { color: var(--hold); }
+.badge-buy { background: var(--buy-bg); color: var(--buy); border: 1px solid var(--buy); }
+.badge-sell { background: var(--sell-bg); color: var(--sell); border: 1px solid var(--sell); }
+.badge-hold { background: var(--hold-bg); color: var(--hold); border: 1px solid var(--hold); }
+
+/* --- metrics grid --- */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+}
+.metric {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+}
+.metric .metric-label {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.metric .metric-value {
+    font-family: var(--mono);
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.chart-block { margin: 20px 0; }
+.chart-block img { width: 100%; border-radius: var(--radius); border: 1px solid var(--border); }
+
+.callout {
+    border-left: 3px solid var(--accent);
+    background: var(--surface);
+    padding: 14px 18px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 20px 0;
+}
+.callout.warn { border-left-color: var(--sell); }
+.callout code { color: var(--accent); font-family: var(--mono); }
+
+table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 0.88rem;
+}
+th { color: var(--text-muted); text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.04em; }
+
+.actions-row { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+
+.error-box {
+    background: var(--surface);
+    border: 1px solid var(--sell);
+    border-radius: var(--radius);
+    padding: 24px;
+    color: var(--text);
+}

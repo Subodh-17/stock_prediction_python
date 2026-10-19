@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}New Prediction &mdash; Ensemble Terminal{% endblock %}
+{% block content %}
+<h1>New Prediction</h1>
+<p class="lede">Runs Linear Regression + LSTM + the LLM panel, blends them into one signal.</p>
+
+<form class="card" action="{{ url_for('predict') }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="async" value="1">
+    <div class="field">
+        <label for="ticker">Ticker</label>
+        <input type="text" id="ticker" name="ticker" value="{{ default_ticker }}" placeholder="AAPL, RELIANCE.NS, VOD.L..." required autofocus>
+        <div class="hint">US stocks: no suffix. Indian: .NS/.BO. Most world exchanges supported via yfinance suffixes.</div>
+    </div>
+
+    <div class="field-row">
+        <div class="field">
+            <label for="period">History period</label>
+            <select id="period" name="period">
+                {% for p in ["3mo", "6mo", "1y", "2y", "5y"] %}
+                <option value="{{ p }}" {% if p == default_period %}selected{% endif %}>{{ p }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="field">
+            <label for="source">Data source</label>
+            <select id="source" name="source">
+                <option value="auto" {% if default_source == "auto" %}selected{% endif %}>auto</option>
+                <option value="yfinance">yfinance</option>
+                <option value="upstox">upstox</option>
+                <option value="groww">groww</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="field">
+        <label for="epochs">LSTM training epochs</label>
+        <input type="number" id="epochs" name="epochs" value="{{ default_epochs }}" min="1" max="200">
+        <div class="hint">Lower = faster, less accurate. 25 is a reasonable default; try 5-10 for a quick look.</div>
+    </div>
+
+    <div class="field">
+        <label class="checkbox-row">
+            <input type="checkbox" id="skip_llm" name="skip_llm">
+            Skip the LLM panel (LR + LSTM only &mdash; faster, no API calls/cost)
+        </label>
+    </div>
+
+    <div class="field">
+        <label class="checkbox-row">
+            <input type="checkbox" id="walk_forward" name="walk_forward">
+            Also run walk-forward validation (expanding-window, more robust than a
+            single train/test split &mdash; adds runtime, retrains the LSTM a few extra times)
+        </label>
+    </div>
+
+    <div class="field">
+        <label class="checkbox-row">
+            <input type="checkbox" id="dynamic_weights" name="dynamic_weights">
+            Use dynamic ensemble weights (derived from walk-forward validation performance
+            instead of the fixed config split &mdash; falls back to fixed weights transparently
+            if there isn't enough walk-forward evidence yet; adds runtime)
+        </label>
+    </div>
+
+    <div class="field">
+        <label class="checkbox-row">
+            <input type="checkbox" id="run_backtest" name="run_backtest">
+            Also run a backtest vs. Buy &amp; Hold (simulated trading over the held-out
+            test period using each model's out-of-sample predictions &mdash; adds runtime)
+        </label>
+    </div>
+
+    <button type="submit">Run Prediction &rarr;</button>
+</form>
+
+<div class="callout">
+    First run against a new ticker can take anywhere from a few seconds to
+    a minute or so, depending on epochs and whether the LLM panel is
+    queried. Walk-forward validation and backtesting add noticeably more
+    time (the LSTM gets retrained several extra times) &mdash; leave them
+    off for a quick look, turn them on for a more thorough evaluation.
+</div>
+{% endblock %}
